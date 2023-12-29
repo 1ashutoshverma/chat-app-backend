@@ -37,12 +37,18 @@ userController.post("/signup", async (req, res) => {
 userController.post(
   "/login",
   passport.authenticate("local", { session: false }),
-  (req, res) => {
+  async (req, res) => {
     if (req.user._id) {
       const token = jwt.sign(
         { userId: req.user._id, role: req.user.role },
         process.env.JWT_SECRET
       );
+
+      const User = await UserModel.findOneAndUpdate(
+        { _id: req.user._id },
+        { status: "online" }
+      );
+      console.log(User);
 
       res.cookie("token", token, { httpOnly: true });
       res.cookie("name", req.user.name);
@@ -79,18 +85,5 @@ userController.get(
     res.redirect(process.env.REDIRECTING_URL);
   }
 );
-
-userController.get("/logout", async (req, res) => {
-  // const User = await UserModel.findOneAndUpdate(
-  //   { email },
-  //   { status: "offline" }
-  // );
-
-  res.clearCookie("token");
-  res.clearCookie("name");
-  res.clearCookie("avatar");
-  res.clearCookie("userId");
-  res.json({ message: "logout succcessful" });
-});
 
 module.exports = { userController };

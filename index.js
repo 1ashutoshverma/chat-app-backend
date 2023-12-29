@@ -97,9 +97,10 @@ io.on("connection", (socket) => {
     }
   );
 
-  app.delete("/logout", async (req, res) => {
+  app.post("/user/logout", async (req, res) => {
     try {
       const { _id, newMessages } = req.body;
+      // console.log(_id);
       const user = await UserModel.findById(_id);
       user.status = "offline";
       user.newMessages = newMessages;
@@ -107,10 +108,16 @@ io.on("connection", (socket) => {
       let members = await UserModel.find();
       members = fixMembers(members);
       socket.broadcast.emit("new-user", members);
-      res.status(200).send();
+
+      res.clearCookie("token");
+      res.clearCookie("name");
+      res.clearCookie("avatar");
+      res.clearCookie("userId");
+
+      res.json({ message: "logout succcessful" });
     } catch (e) {
       console.log(e);
-      res.status(400).send();
+      res.status(400).json({ message: "Something went wrong" });
     }
   });
 });
