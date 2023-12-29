@@ -6,8 +6,11 @@ const { userController } = require("./controllers/user.routes");
 const cookieParser = require("cookie-parser");
 const { authorization } = require("./middlewares/authorization");
 const { Server } = require("socket.io");
+const { UserModel } = require("./models/user.model");
+const { ChatMessageModel } = require("./models/message.model");
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 8080;
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
@@ -33,15 +36,82 @@ app.get("/", (req, res) => {
 
 app.use("/user", userController);
 
-io.on("connection", (socket) => {
-  console.log(socket);
+const getLastMessages = async (room) => {
+  let roomMessages = await ChatMessageModel.aggregate([
+    { $match: { to: room } },
+    { $group: { _id: "$date", messageByDate: { $push: "$$ROOT" } } },
+  ]);
+  return roomMessages;
+};
 
-  socket.on("chatMsg", (msg) => {
-    io.emit("chatMsg", msg);
+const sortRoomMessagesByDate = (messages) => {
+  return messages.sort(function (a, b) {
+    let date1 = a._id.split("/");
+    let date2 = b._id.split("/");
+
+    date1 = date1[2] + date1[0] + date1[1];
+    date2 = date2[2] + date2[0] + date2[1];
+
+    return date1 < date2 ? -1 : 1;
+  });
+};
+
+const fixMembers = (arr) => {
+  return arr.map((e) => {
+    return { _id: e._id, avatar: e.avatar, name: e.name, status: e.status };
+  });
+};
+
+io.on("connection", (socket) => {
+  //When user get connected he will recieve all the informetion of the members
+  socket.on("new-user", async () => {
+    let members = await UserModel.find();
+    members = fixMembers(members);
+    io.emit("new-user", members);
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  //When he will switch from a room to the other room
+  socket.on("join-room", async ({ newRoom, previousRoom }) => {
+    socket.leave(previousRoom);
+    socket.join(newRoom);
+    let roomMessages = await getLastMessages(newRoom);
+    roomMessages = sortRoomMessagesByDate(roomMessages);
+    socket.emit("room-messages", roomMessages);
+  });
+
+  socket.on(
+    "message-room",
+    async ({ room, content, sender, time, date, type }) => {
+      const newMessage = await ChatMessageModel.create({
+        content,
+        to: room,
+        from: sender,
+        time,
+        date,
+        type,
+      });
+      let roomMessages = await getLastMessages(room);
+      roomMessages = sortRoomMessagesByDate(roomMessages);
+      io.to(room).emit("room-messages", roomMessages);
+      socket.broadcast.emit("notification", room);
+    }
+  );
+
+  app.delete("/logout", async (req, res) => {
+    try {
+      const { _id, newMessages } = req.body;
+      const user = await UserModel.findById(_id);
+      user.status = "offline";
+      user.newMessages = newMessages;
+      await user.save();
+      let members = await UserModel.find();
+      members = fixMembers(members);
+      socket.broadcast.emit("new-user", members);
+      res.status(200).send();
+    } catch (e) {
+      console.log(e);
+      res.status(400).send();
+    }
   });
 });
 

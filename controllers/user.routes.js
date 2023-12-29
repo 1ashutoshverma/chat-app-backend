@@ -47,6 +47,7 @@ userController.post(
       res.cookie("token", token, { httpOnly: true });
       res.cookie("name", req.user.name);
       res.cookie("avatar", req.user.avatar);
+      res.cookie("userId", req.user._id.toString());
 
       return res.json({ message: "login succcessful" });
     }
@@ -73,15 +74,22 @@ userController.get(
     res.cookie("token", token, { httpOnly: true });
     res.cookie("name", req.user.name);
     res.cookie("avatar", req.user.avatar);
+    res.cookie("userId", req.user._id.toString());
 
     res.redirect(process.env.REDIRECTING_URL);
   }
 );
 
-userController.get("/logout", (req, res) => {
+userController.get("/logout", async (req, res) => {
+  // const User = await UserModel.findOneAndUpdate(
+  //   { email },
+  //   { status: "offline" }
+  // );
+
   res.clearCookie("token");
   res.clearCookie("name");
   res.clearCookie("avatar");
+  res.clearCookie("userId");
   res.json({ message: "logout succcessful" });
 });
 

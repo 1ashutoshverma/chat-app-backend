@@ -15,11 +15,16 @@ passport.use(
           message: "User not found, please sign up first!",
         });
       }
-      bcrypt.compare(password, user.password, function (err, result) {
+      bcrypt.compare(password, user.password, async function (err, result) {
         if (!result) {
           return done(null, { message: "Wrong Credentials" });
         }
-        return done(null, user);
+        const User = await UserModel.findOneAndUpdate(
+          { email },
+          { status: "online" }
+        );
+        console.log(User);
+        return done(null, User);
       });
     }
   )
@@ -49,6 +54,7 @@ passport.use(
           password: v4(),
           loginType: "google",
           avatar: profile._json.picture,
+          status: "online",
         });
 
         return cb(null, newUser);

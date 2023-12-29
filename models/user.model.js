@@ -22,6 +22,7 @@ const userSchema = mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    status: { type: String, enum: ["offline", "online"], default: "offline" },
     role: {
       type: String,
       enum: ["ADMIN", "USER"],
@@ -37,9 +38,13 @@ const userSchema = mongoose.Schema(
       enum: ["google", "email_password"],
       default: "email_password",
     },
+    newMessages: {
+      type: Object,
+    },
   },
   {
     timestamps: true,
+    minimize: false,
   }
 );
 
