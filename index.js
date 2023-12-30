@@ -116,7 +116,7 @@ io.on("connection", (socket) => {
 
       res.json({ message: "logout succcessful" });
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       res.status(400).json({ message: "Something went wrong" });
     }
   });

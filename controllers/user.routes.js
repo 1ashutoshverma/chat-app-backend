@@ -48,7 +48,7 @@ userController.post(
         { _id: req.user._id },
         { status: "online" }
       );
-      console.log(User);
+      // console.log(User);
 
       res.cookie("token", token, { httpOnly: true });
       res.cookie("name", req.user.name);
@@ -72,10 +72,14 @@ userController.get(
     failureRedirect: "/login",
     session: false,
   }),
-  (req, res) => {
+  async (req, res) => {
     const token = jwt.sign(
       { userId: req.user._id, role: req.user.role },
       process.env.JWT_SECRET
+    );
+    const User = await UserModel.findOneAndUpdate(
+      { _id: req.user._id },
+      { status: "online" }
     );
     res.cookie("token", token, { httpOnly: true });
     res.cookie("name", req.user.name);
