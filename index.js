@@ -93,7 +93,7 @@ io.on("connection", (socket) => {
       let roomMessages = await getLastMessages(room);
       roomMessages = sortRoomMessagesByDate(roomMessages);
       io.to(room).emit("room-messages", roomMessages);
-      socket.broadcast.emit("notification", room);
+      socket.broadcast.emit("notification", room, type, sender);
     }
   );
 
