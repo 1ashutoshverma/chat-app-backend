@@ -97,6 +97,10 @@ io.on("connection", (socket) => {
     }
   );
 
+  socket.on("disconnect", () => {
+    console.log("disconnected");
+  });
+
   app.post("/user/logout", async (req, res) => {
     try {
       const { _id, newMessages } = req.body;
