@@ -11,13 +11,24 @@ provider:
 functions:
   app:
     handler: handler.app
+    timeout: 30
+    environment:
+      MONGO_URI: mongodb+srv://ashu9236047613:ashu983939@cluster0.iddf1fq.mongodb.net/chat-app
     events:
-      - httpApi:
+      - http:
           path: /
           method: ANY
-      - httpApi:
+          cors: true
+      - http:
           path: /{proxy+}
           method: ANY
+          cors: true
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+      - websocket:
+          route: $default
 
 package:
   exclude:
@@ -25,14 +36,42 @@ package:
     - .git/**
     - .serverless/**
 
-custom:
-  webpack:
-    includeModules:
-      forceExclude:
-        - express
-        - socket.io
-
 resources:
   Resources:
-    # Define any necessary resources, such as DynamoDB tables
-# Add environment variables in a separate file (not included here for security)
+    SocketServerApi:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Name: SocketServerApi
+        ProtocolType: WEBSOCKET
+        RouteSelectionExpression: "$request.body.action"
+
+    SocketServerIntegration:
+      Type: AWS::ApiGatewayV2::Integration
+      Properties:
+        ApiId: !Ref SocketServerApi
+        IntegrationType: AWS_PROXY
+        IntegrationUri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/app/invocations
+
+    SocketServerConnectRoute:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        ApiId: !Ref SocketServerApi
+        RouteKey: $connect
+
+    SocketServerDisconnectRoute:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        ApiId: !Ref SocketServerApi
+        RouteKey: $disconnect
+
+    SocketServerDefaultRoute:
+      Type: AWS::ApiGatewayV2::Route
+      Properties:
+        ApiId: !Ref SocketServerApi
+        RouteKey: $default
+
+    SocketServerDeployment:
+      Type: AWS::ApiGatewayV2::Deployment
+      Properties:
+        ApiId: !Ref SocketServerApi
