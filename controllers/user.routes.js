@@ -50,8 +50,8 @@ userController.post(
       );
       // console.log(User);
 
-      res.cookie("token", token, { httpOnly: true });
-      res.cookie("name", req.user.name);
+      res.cookie("token", token, { httpOnly: true, secure: false, path: "/" });
+      res.cookie("name", req.user.name, { path: "/" });
       res.cookie("avatar", req.user.avatar);
       res.cookie("userId", req.user._id.toString());
 
