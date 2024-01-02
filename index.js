@@ -9,6 +9,14 @@ const { Server } = require("socket.io");
 const { UserModel } = require("./models/user.model");
 const { ChatMessageModel } = require("./models/message.model");
 
+try {
+  connection;
+  console.log("DB is connected");
+} catch (error) {
+  console.log("Error while connection to db");
+  console.log(error);
+}
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 8080;
@@ -30,7 +38,7 @@ app.use(
 );
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.json({ message: "server is running" });
 });
 
@@ -126,13 +134,15 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(PORT, async () => {
-  try {
-    await connection;
-    console.log("DB is connected");
-  } catch (error) {
-    console.log("Error while connection to db");
-    console.log(error);
-  }
-  console.log("server is running");
-});
+// httpServer.listen(PORT, async () => {
+//   // try {
+//   //   await connection;
+//   //   console.log("DB is connected");
+//   // } catch (error) {
+//   //   console.log("Error while connection to db");
+//   //   console.log(error);
+//   // }
+//   console.log("server is running");
+// });
+
+module.exports = { httpServer };
