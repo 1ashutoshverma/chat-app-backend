@@ -11,7 +11,7 @@ const { ChatMessageModel } = require("./models/message.model");
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 80;
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
