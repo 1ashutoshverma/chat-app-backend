@@ -13,15 +13,10 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 8080;
 const httpServer = http.createServer(app);
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Credentials", true);
-  next();
-});
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -30,7 +25,7 @@ const io = new Server(httpServer, {
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: "*",
     credentials: true,
   })
 );
