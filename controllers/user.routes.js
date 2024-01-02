@@ -55,7 +55,7 @@ userController.post(
         secure: false,
         sameSite: "none",
       });
-      res.cookie("name", req.user.name, { SameSite: "None" });
+      res.cookie("name", req.user.name, { secure: true, sameSite: "none" });
       res.cookie("avatar", req.user.avatar);
       res.cookie("userId", req.user._id.toString());
 
