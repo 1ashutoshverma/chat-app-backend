@@ -9,14 +9,6 @@ const { Server } = require("socket.io");
 const { UserModel } = require("./models/user.model");
 const { ChatMessageModel } = require("./models/message.model");
 
-// try {
-//   connection;
-//   console.log("DB is connected");
-// } catch (error) {
-//   console.log("Error while connection to db");
-//   console.log(error);
-// }
-
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 8080;
@@ -41,7 +33,9 @@ app.use(express.json());
 app.get("/api", (req, res) => {
   res.json({ message: "server is running" });
 });
-
+app.get("/user", (req, res) => {
+  res.json({ message: "working" });
+});
 app.use("/user", userController);
 
 const getLastMessages = async (room) => {
@@ -112,7 +106,6 @@ io.on("connection", (socket) => {
   app.post("/user/logout", async (req, res) => {
     try {
       const { _id, newMessages } = req.body;
-      // console.log(_id);
       const user = await UserModel.findById(_id);
       user.status = "offline";
       user.newMessages = newMessages;
@@ -128,7 +121,6 @@ io.on("connection", (socket) => {
 
       res.json({ message: "logout succcessful" });
     } catch (e) {
-      // console.log(e);
       res.status(400).json({ message: "Something went wrong" });
     }
   });
@@ -144,5 +136,3 @@ httpServer.listen(PORT, async () => {
   }
   console.log("server is running");
 });
-
-// module.exports = { httpServer };
