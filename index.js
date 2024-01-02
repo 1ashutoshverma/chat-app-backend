@@ -16,7 +16,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: ["http://localhost:3000"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -25,7 +25,7 @@ const io = new Server(httpServer, {
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:3000"],
     credentials: true,
   })
 );
