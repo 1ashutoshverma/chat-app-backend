@@ -115,10 +115,10 @@ io.on("connection", (socket) => {
       members = fixMembers(members);
       socket.broadcast.emit("new-user", members);
 
-      // res.clearCookie("token");
-      // res.clearCookie("name");
-      // res.clearCookie("avatar");
-      // res.clearCookie("userId");
+      res.clearCookie("token");
+      res.clearCookie("name");
+      res.clearCookie("avatar");
+      res.clearCookie("userId");
 
       res.json({ message: "logout succcessful" });
     } catch (e) {

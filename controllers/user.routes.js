@@ -50,14 +50,14 @@ userController.post(
       );
 
       // console.log(User);
-      // res.cookie("token", token, {
-      //   httpOnly: true,
-      //   secure: false,
-      //   sameSite: "none",
-      // });
-      // res.cookie("name", req.user.name, { secure: true, sameSite: "none" });
-      // res.cookie("avatar", req.user.avatar);
-      // res.cookie("userId", req.user._id.toString());
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+      });
+      res.cookie("name", req.user.name, { secure: true, sameSite: "none" });
+      res.cookie("avatar", req.user.avatar);
+      res.cookie("userId", req.user._id.toString());
 
       return res.json({
         message: "login succcessful",
