@@ -52,12 +52,15 @@ userController.post(
       // console.log(User);
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
+        secure: "none",
         sameSite: "none",
       });
       res.cookie("name", req.user.name, { secure: true, sameSite: "none" });
-      res.cookie("avatar", req.user.avatar);
-      res.cookie("userId", req.user._id.toString());
+      res.cookie("avatar", req.user.avatar, { secure: true, sameSite: "none" });
+      res.cookie("userId", req.user._id.toString(), {
+        secure: true,
+        sameSite: "none",
+      });
 
       return res.json({
         message: "login succcessful",
@@ -93,10 +96,17 @@ userController.get(
       { _id: req.user._id },
       { status: "online" }
     );
-    res.cookie("token", token, { httpOnly: true });
-    res.cookie("name", req.user.name);
-    res.cookie("avatar", req.user.avatar);
-    res.cookie("userId", req.user._id.toString());
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.cookie("name", req.user.name, { secure: true, sameSite: "none" });
+    res.cookie("avatar", req.user.avatar, { secure: true, sameSite: "none" });
+    res.cookie("userId", req.user._id.toString(), {
+      secure: true,
+      sameSite: "none",
+    });
 
     res.redirect(process.env.REDIRECTING_URL);
   }
