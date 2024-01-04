@@ -16,7 +16,7 @@ const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://own-chat-app.vercel.app"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -25,7 +25,7 @@ const io = new Server(httpServer, {
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://own-chat-app.vercel.app"],
     credentials: true,
   })
 );
@@ -115,10 +115,10 @@ io.on("connection", (socket) => {
       members = fixMembers(members);
       socket.broadcast.emit("new-user", members);
 
-      res.clearCookie("token");
-      res.clearCookie("name");
-      res.clearCookie("avatar");
-      res.clearCookie("userId");
+      // res.clearCookie("token");
+      // res.clearCookie("name");
+      // res.clearCookie("avatar");
+      // res.clearCookie("userId");
 
       res.json({ message: "logout succcessful" });
     } catch (e) {
