@@ -67,8 +67,15 @@ const fixMembers = (arr) => {
 
 io.on("connection", (socket) => {
   //When user get connected he will recieve all the informetion of the members
-  socket.on("new-user", async () => {
+  socket.on("new-user", async (_id) => {
+    // console.log(_id);
+    const User = await UserModel.findOneAndUpdate(
+      { _id: _id },
+      { status: "online" }
+    );
+    socket._id = _id;
     let members = await UserModel.find();
+
     members = fixMembers(members);
     io.emit("new-user", members);
   });
@@ -100,8 +107,17 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("disconnect", () => {
-    console.log("disconnected");
+  socket.on("disconnect", async () => {
+    // console.log("disconnected", socket._id);
+    if (socket._id) {
+      const User = await UserModel.findOneAndUpdate(
+        { _id: socket._id },
+        { status: "offline" }
+      );
+      let members = await UserModel.find();
+      members = fixMembers(members);
+      socket.broadcast.emit("new-user", members);
+    }
   });
 
   app.post("/user/logout", async (req, res) => {

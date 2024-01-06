@@ -44,11 +44,6 @@ userController.post(
         process.env.JWT_SECRET
       );
 
-      const User = await UserModel.findOneAndUpdate(
-        { _id: req.user._id },
-        { status: "online" }
-      );
-
       // console.log(User);
       res.cookie("token", token, {
         httpOnly: true,
