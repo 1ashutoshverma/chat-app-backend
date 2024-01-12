@@ -68,7 +68,6 @@ const fixMembers = (arr) => {
 io.on("connection", (socket) => {
   //When user get connected he will recieve all the informetion of the members
   socket.on("new-user", async (_id) => {
-    // console.log(_id);
     const User = await UserModel.findOneAndUpdate(
       { _id: _id },
       { status: "online" }
@@ -108,7 +107,6 @@ io.on("connection", (socket) => {
   );
 
   socket.on("disconnect", async () => {
-    // console.log("disconnected", socket._id);
     if (socket._id) {
       const User = await UserModel.findOneAndUpdate(
         { _id: socket._id },
