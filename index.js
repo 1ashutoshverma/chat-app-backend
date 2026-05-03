@@ -1,3 +1,9 @@
+// Polyfill for SlowBuffer to maintain compatibility with older dependencies on newer Node versions
+const buffer = require("buffer");
+if (!buffer.SlowBuffer) {
+  buffer.SlowBuffer = buffer.Buffer;
+}
+
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
